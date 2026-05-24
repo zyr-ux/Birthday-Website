@@ -285,6 +285,89 @@ function FinalBannerItem({ banner, colors }: { banner: any, colors: string[] }) 
   );
 }
 
+function FlowerRow({
+  side,
+  svgs,
+  sizes,
+  offsets,
+  rotations,
+  delays,
+}: {
+  side: "left" | "right";
+  svgs: string[];
+  sizes: number[];
+  offsets: number[];
+  rotations: number[];
+  delays: number[];
+}) {
+  const total = svgs.length;
+  const rotateValues = useMemo(
+    () => Array.from({ length: total }, () => new MotionValue(0)),
+    [total],
+  );
+
+  useEffect(() => {
+    const controls = rotateValues.map((value, i) => {
+      const direction = i % 2 === 0 ? 1 : -1;
+      return animate(value, [0, direction * 2.8, 0, -direction * 2.2, 0], {
+        duration: 5.2 + i * 0.25,
+        repeat: Infinity,
+        repeatType: "loop",
+        ease: "easeInOut",
+      });
+    });
+
+    return () => {
+      controls.forEach((control) => control.stop());
+    };
+  }, [rotateValues]);
+
+  const handleHit = (index: number, movementX: number) => {
+    const baseVelocity = movementX * 8;
+
+    animate(rotateValues[index], 0, {
+      type: "spring",
+      velocity: baseVelocity,
+      stiffness: 30 + index * 2,
+      damping: 10 + index * 0.4,
+      mass: 0.5 + index * 0.1,
+    });
+  };
+
+  return (
+    <div className={side === "left" ? "flex items-end ml-[-10px]" : "flex items-end mr-[-10px]"}>
+      {Array.from({ length: total }).map((_, i) => {
+        const springRotate = useSpring(rotateValues[i], {
+          stiffness: 58,
+          damping: 15,
+          mass: 0.95,
+        });
+
+        return (
+          <motion.div
+            key={`${side}-flower-${i}`}
+            initial={{ opacity: 0, y: 30, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: delays[i], duration: 0.8, ease: "easeOut" }}
+            style={{
+              width: `${sizes[i]}px`,
+              height: "auto",
+              marginBottom: `${offsets[i]}px`,
+              rotate: useTransform(springRotate, (v) => v + rotations[i]),
+              transformOrigin: "50% 100%",
+              flexShrink: 0,
+            }}
+            onMouseMove={(e) => handleHit(i, e.movementX)}
+            className="mx-[-6px] pointer-events-auto"
+          >
+            <img src={svgs[i]} alt="" className="block w-full h-auto select-none" draggable={false} />
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function MainCelebration({ availableImages }: MainCelebrationProps) {
 
   const defaultImages = Array.from({ length: 36 }, (_, i) => ({
@@ -387,7 +470,7 @@ export default function MainCelebration({ availableImages }: MainCelebrationProp
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.5, delay: 1.0, ease: "easeOut" }}
-        className="fixed bottom-0 left-0 right-0 z-10 pointer-events-none flex items-end justify-between overflow-hidden"
+        className="fixed -bottom-2 left-0 right-0 z-10 pointer-events-none flex items-end justify-between overflow-hidden"
         style={{ height: "140px" }}
       >
         <div
@@ -397,60 +480,22 @@ export default function MainCelebration({ availableImages }: MainCelebrationProp
             background: "linear-gradient(to top, #1E5128, #4E9F3D00)",
           }}
         />
-        <div className="flex items-end ml-[-10px]">
-          {Array.from({ length: 6 }).map((_, i) => {
-            const svgs = ["/sunflower-group-1.svg", "/sunflower-group-2.svg", "/sunflower-group-3.svg", "/sunflower-group-4.svg", "/sunflower-group-5.svg", "/sunflower-group-6.svg"];
-            const sizes = [70, 85, 65, 78, 60, 55];
-            const offsets = [0, 5, -2, 8, 3, 2];
-            const rotations = [-10, 5, -4, 8, -3, -6];
-            const delays = [1.0, 1.1, 1.15, 1.05, 1.2, 1.25];
-            return (
-              <motion.img
-                key={`sunflower-left-${i}`}
-                src={svgs[i]}
-                alt=""
-                initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: delays[i], duration: 0.8, ease: "easeOut" }}
-                style={{
-                  width: `${sizes[i]}px`,
-                  height: "auto",
-                  marginBottom: `${offsets[i]}px`,
-                  transform: `rotate(${rotations[i]}deg)`,
-                  flexShrink: 0,
-                }}
-                className="mx-[-6px]"
-              />
-            );
-          })}
-        </div>
-        <div className="flex items-end mr-[-10px]">
-          {Array.from({ length: 6 }).map((_, i) => {
-            const svgs = ["/sunflower-group-6.svg", "/sunflower-group-5.svg", "/sunflower-group-4.svg", "/sunflower-group-3.svg", "/sunflower-group-2.svg", "/sunflower-group-1.svg"];
-            const sizes = [58, 80, 68, 88, 60, 62];
-            const offsets = [3, 0, 6, -3, 2, 4];
-            const rotations = [6, -5, 8, -3, 5, 10];
-            const delays = [1.1, 1.0, 1.2, 1.08, 1.15, 1.25];
-            return (
-              <motion.img
-                key={`sunflower-right-${i}`}
-                src={svgs[i]}
-                alt=""
-                initial={{ opacity: 0, y: 30, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: delays[i], duration: 0.8, ease: "easeOut" }}
-                style={{
-                  width: `${sizes[i]}px`,
-                  height: "auto",
-                  marginBottom: `${offsets[i]}px`,
-                  transform: `rotate(${rotations[i]}deg)`,
-                  flexShrink: 0,
-                }}
-                className="mx-[-6px]"
-              />
-            );
-          })}
-        </div>
+        <FlowerRow
+          side="left"
+          svgs={["/sunflower-group-1.svg", "/sunflower-group-2.svg", "/sunflower-group-3.svg", "/sunflower-group-4.svg", "/sunflower-group-5.svg", "/sunflower-group-6.svg"]}
+          sizes={[70, 85, 65, 78, 60, 55]}
+          offsets={[0, 5, -2, 8, 3, 2]}
+          rotations={[-10, 5, -4, 8, -3, -6]}
+          delays={[1.0, 1.1, 1.15, 1.05, 1.2, 1.25]}
+        />
+        <FlowerRow
+          side="right"
+          svgs={["/sunflower-group-6.svg", "/sunflower-group-5.svg", "/sunflower-group-4.svg", "/sunflower-group-3.svg", "/sunflower-group-2.svg", "/sunflower-group-1.svg"]}
+          sizes={[58, 80, 68, 88, 60, 62]}
+          offsets={[3, 0, 6, -3, 2, 4]}
+          rotations={[6, -5, 8, -3, 5, 10]}
+          delays={[1.1, 1.0, 1.2, 1.08, 1.15, 1.25]}
+        />
       </motion.div>
     </div>
   );
