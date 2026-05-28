@@ -66,8 +66,8 @@ export default function HomeClient({ availableImages }: HomeClientProps) {
               className="flex items-center justify-center w-full min-h-screen z-10"
             >
               <Envelope 
-                onOpenLetter={startMusic} 
-                onComplete={handleOpenCelebration} 
+                onOpenLetterAction={startMusic} 
+                onCompleteAction={handleOpenCelebration} 
               />
             </motion.div>
           ) : (

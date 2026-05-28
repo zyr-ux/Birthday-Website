@@ -4,11 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 type EnvelopeProps = {
-  onOpenLetter: () => void;
-  onComplete: () => void;
+  onOpenLetterAction: () => void;
+  onCompleteAction: () => void;
 };
 
-export default function Envelope({ onOpenLetter, onComplete }: EnvelopeProps) {
+export default function Envelope({ onOpenLetterAction, onCompleteAction }: EnvelopeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenedFully, setIsOpenedFully] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ export default function Envelope({ onOpenLetter, onComplete }: EnvelopeProps) {
   const handleOpen = () => {
     if (!isOpen) {
       setIsOpen(true);
-      onOpenLetter();
+      onOpenLetterAction();
 
       if (animationRef.current) {
         // Play segments: from start (frame 0) to open state (frame 58)
@@ -102,8 +102,8 @@ export default function Envelope({ onOpenLetter, onComplete }: EnvelopeProps) {
             {/* Letter Content */}
             <div className="text-[#3A2D13] w-full flex flex-col items-center pt-1 sm:pt-2">
               <h3
-                className="text-center text-yellow-800 font-bold mb-1 sm:mb-2 leading-none"
-                style={{ fontSize: "clamp(18px, 6.5cqw, 42px)" }}
+                className="text-center font-bold mb-1 sm:mb-2 leading-none"
+                style={{ color: '#006f48', fontSize: "clamp(18px, 6.5cqw, 42px)" }}
               >
                 Dearest Sayantani
               </h3>
@@ -128,7 +128,7 @@ export default function Envelope({ onOpenLetter, onComplete }: EnvelopeProps) {
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Avoid any container click triggers
-                onComplete();
+                onCompleteAction();
               }}
               className="relative group flex items-center justify-center font-bold rounded-full shadow-lg border-4 transform hover:scale-110 transition-all duration-300 z-50 pointer-events-auto cursor-pointer"
               style={{
