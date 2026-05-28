@@ -378,6 +378,34 @@ export default function MainCelebration({ availableImages }: MainCelebrationProp
 
   const displayImages = availableImages.length > 0 ? availableImages : defaultImages;
 
+  const shuffledImages = useMemo(() => {
+    const numNeeded = 36;
+    const available = [...displayImages];
+    const result = [];
+
+    if (available.length >= numNeeded) {
+      for (let i = available.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = available[i];
+        available[i] = available[j];
+        available[j] = temp;
+      }
+      return available.slice(0, numNeeded);
+    } else {
+      while (result.length < numNeeded) {
+        const shuffled = [...available];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = shuffled[i];
+          shuffled[i] = shuffled[j];
+          shuffled[j] = temp;
+        }
+        result.push(...shuffled);
+      }
+      return result.slice(0, numNeeded);
+    }
+  }, []);
+
   const banners = useMemo(() => {
     const rand = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
     const positions = [
@@ -440,7 +468,7 @@ export default function MainCelebration({ availableImages }: MainCelebrationProp
         >
           {heartLayout.flat().map((index, i) => {
             if (index !== null) {
-              const img = displayImages[index % displayImages.length];
+              const img = shuffledImages[index];
               return (
                 <motion.div
                   key={i}
