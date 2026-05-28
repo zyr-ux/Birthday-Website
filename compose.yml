@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  birthday-website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    # Uncomment for production with specific port mapping
+    # ports:
+    #   - "8080:3000"  # Change 8080 to your desired external port
